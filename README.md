@@ -33,7 +33,7 @@ A sophisticated weather information assistant that uses LangChain and OpenAI's G
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/lyasOuchen1/simple-weather-agent.git
+git clone https://github.com/IlyasOuchen1/simple-weather-agent.git
 cd simple-weather-agent
 ```
 
