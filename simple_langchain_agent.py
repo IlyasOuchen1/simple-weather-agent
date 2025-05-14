@@ -20,6 +20,11 @@ class SimpleLangChainWeatherAgent:
         if not openai_api_key:
             raise ValueError("OpenAI API key not found. Please set OPENAI_API_KEY in your .env file.")
         
+        
+        # Dans la méthode __init__ de la classe SimpleLangChainWeatherAgent:
+        self.last_weather_data = None
+        self.last_location = None
+
         # Initialize LLM
         self.llm = ChatOpenAI(
             model="gpt-3.5-turbo", 
@@ -62,6 +67,9 @@ class SimpleLangChainWeatherAgent:
             return self._process_query_tot(query)
 
     def _process_query_react(self, query):
+        # Reset last weather data
+        self.last_weather_data = None
+        self.last_location = None
         """Process query using the ReAct pattern with LangChain"""
         print("\n" + "="*80)
         print("REACT REASONING PROCESS (LangChain)".center(80))
@@ -160,7 +168,10 @@ class SimpleLangChainWeatherAgent:
         if needs_weather:
             print(f"• Fetching weather data for '{location}'...")
             weather_data = self.weather_service.get_weather(location)
-            
+            # Store the last weather data and location for other agents to use
+            self.last_weather_data = weather_data
+            self.last_location = location
+
             if "error" in weather_data:
                 print(f"  ✗ Error: {weather_data['error']}")
                 return f"Sorry, I couldn't get weather information: {weather_data['error']}"
@@ -402,6 +413,9 @@ class SimpleLangChainWeatherAgent:
 
     
     def _process_query_cot(self, query):
+        # Reset last weather data
+        self.last_weather_data = None
+        self.last_location = None
         """Process query using Chain of Thought (CoT) reasoning with LangChain"""
         print("\n" + "="*80)
         print("CHAIN OF THOUGHT (CoT) REASONING PROCESS (LangChain)".center(80))
@@ -489,6 +503,9 @@ class SimpleLangChainWeatherAgent:
         
         print(f"• Fetching weather data for '{location}'...")
         weather_data = self.weather_service.get_weather(location)
+        # Store the last weather data and location for other agents to use
+        self.last_weather_data = weather_data
+        self.last_location = location
         
         if "error" in weather_data:
             print(f"  ✗ Error: {weather_data['error']}")
@@ -608,6 +625,9 @@ class SimpleLangChainWeatherAgent:
 
 
     def _process_query_tot(self, query):
+        # Reset last weather data
+        self.last_weather_data = None
+        self.last_location = None
         """Process query using Tree of Thoughts (ToT) reasoning with LangChain"""
         print("\n" + "="*80)
         print("TREE OF THOUGHTS (ToT) REASONING PROCESS (LangChain)".center(80))
@@ -744,6 +764,9 @@ class SimpleLangChainWeatherAgent:
         
         print(f"• Fetching weather data for '{selected_location}'...")
         weather_data = self.weather_service.get_weather(selected_location)
+        # Store the last weather data and location for other agents to use
+        self.last_weather_data = weather_data
+        self.last_location = selected_location
         
         if "error" in weather_data:
             print(f"  ✗ Error: {weather_data['error']}")

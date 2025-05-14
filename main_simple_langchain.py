@@ -1,4 +1,5 @@
 from simple_langchain_agent import SimpleLangChainWeatherAgent
+from clothe_agent import ClotheAgent
 import os
 import traceback
 from dotenv import load_dotenv
@@ -7,17 +8,19 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def main():
-    print("Welcome to the Simple LangChain Weather Agent!")
+    print("Welcome to the LangChain Weather Agent!")
     print("This agent uses LangChain for different reasoning patterns.")
     print("You can ask about the weather in any location.")
     print("Available reasoning types: react, cot, tot")
+    print("After getting weather information, you can ask for clothing recommendations.")
     print("Type 'exit' to quit.\n")
     
     try:
-        # Create the agent
-        print("Initializing Simple LangChain Weather Agent...")
-        agent = SimpleLangChainWeatherAgent()
-        print("Agent initialized successfully!\n")
+        # Initialize both agents
+        print("Initializing Weather and Clothing Agents...")
+        weather_agent = SimpleLangChainWeatherAgent()
+        clothe_agent = ClotheAgent()
+        print("Agents initialized successfully!\n")
         
         while True:
             # Separate prompts for reasoning type and query
@@ -40,16 +43,32 @@ def main():
             
             print(f"Using reasoning type: {reasoning_type}")
             try:
-                response = agent.process_query(query, reasoning_type)
+                # Get weather information
+                weather_response = weather_agent.process_query(query, reasoning_type)
                 
                 print("\nAgent response:")
-                
-                # Check for possibly truncated response
-                if response and len(response) > 0 and response[0].islower():
-                    print("Note: Response appears to be truncated at the beginning.")
-                
-                print(response)
+                print(weather_response)
                 print()
+                
+                # Check if user wants clothing recommendations
+                if input("Would you like clothing recommendations based on this weather? (y/n): ").lower().startswith('y'):
+                    # Extract weather data and location
+                    # We need to access the last processed weather data
+                    if hasattr(weather_agent, 'last_weather_data') and hasattr(weather_agent, 'last_location'):
+                        weather_data = weather_agent.last_weather_data
+                        location = weather_agent.last_location
+                        
+                        # Generate clothing recommendation
+                        clothing_recommendation = clothe_agent.generate_clothing_recommendation(
+                            weather_data, location
+                        )
+                        
+                        print("\nClothing recommendation:")
+                        print(clothing_recommendation)
+                        print()
+                    else:
+                        print("\nSorry, I don't have enough weather information to make clothing recommendations.")
+                        print("Please try another weather query first.\n")
             except Exception as e:
                 print(f"Error processing query: {e}")
                 print("Please try a different query or reasoning type.")
